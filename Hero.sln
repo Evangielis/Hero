@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hero", "Hero\Hero\Hero.csproj", "{6388B738-D627-453D-943B-96E44CAB581E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeroContent", "Hero\HeroContent\HeroContent.contentproj", "{8BD34260-E57E-4E54-816B-09419FCF8287}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Archidamas", "..\Archidamas\Archidamas\Archidamas\Archidamas.csproj", "{63DC39A6-2199-4834-AB54-93AEAEC7AF89}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchidamasContent", "..\Archidamas\Archidamas\ArchidamasContent\ArchidamasContent.contentproj", "{603F5721-2FB4-434B-B177-8CC208226B15}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6388B738-D627-453D-943B-96E44CAB581E}.Debug|x86.ActiveCfg = Debug|x86
+		{6388B738-D627-453D-943B-96E44CAB581E}.Debug|x86.Build.0 = Debug|x86
+		{6388B738-D627-453D-943B-96E44CAB581E}.Release|x86.ActiveCfg = Release|x86
+		{6388B738-D627-453D-943B-96E44CAB581E}.Release|x86.Build.0 = Release|x86
+		{8BD34260-E57E-4E54-816B-09419FCF8287}.Debug|x86.ActiveCfg = Debug|x86
+		{8BD34260-E57E-4E54-816B-09419FCF8287}.Release|x86.ActiveCfg = Release|x86
+		{63DC39A6-2199-4834-AB54-93AEAEC7AF89}.Debug|x86.ActiveCfg = Debug|x86
+		{63DC39A6-2199-4834-AB54-93AEAEC7AF89}.Debug|x86.Build.0 = Debug|x86
+		{63DC39A6-2199-4834-AB54-93AEAEC7AF89}.Release|x86.ActiveCfg = Release|x86
+		{63DC39A6-2199-4834-AB54-93AEAEC7AF89}.Release|x86.Build.0 = Release|x86
+		{603F5721-2FB4-434B-B177-8CC208226B15}.Debug|x86.ActiveCfg = Debug|x86
+		{603F5721-2FB4-434B-B177-8CC208226B15}.Release|x86.ActiveCfg = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
