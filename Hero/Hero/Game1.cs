@@ -24,6 +24,7 @@ namespace Hero
         StageComponent stage;
         MapComponent map;
         DirectorComponent director;
+        HUDComponent hud;
 
         public Game1()
         {
@@ -32,6 +33,7 @@ namespace Hero
 
             controls = new ControlComponent(this);
             camera = new CameraComponent(this);     //No dependencies
+            hud = new HUDComponent(this);
 
             stage = new StageComponent(this);       //Dependent on ICameraService
             map = new MapComponent(this);           //Dependent on ICameraService, IStageService

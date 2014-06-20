@@ -8,3 +8,4 @@ C:\Documents and Settings\Lee.HAL\my documents\visual studio 2010\Projects\Hero\
 C:\Documents and Settings\Lee.HAL\my documents\visual studio 2010\Projects\Hero\Hero\Hero\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
 C:\Documents and Settings\Lee.HAL\my documents\visual studio 2010\Projects\Hero\Hero\Hero\obj\x86\Debug\Hero.exe
 C:\Documents and Settings\Lee.HAL\my documents\visual studio 2010\Projects\Hero\Hero\Hero\obj\x86\Debug\Hero.pdb
+C:\Documents and Settings\Lee.HAL\My Documents\Visual Studio 2010\Projects\Hero\Hero\Hero\bin\x86\Debug\Content\Blank.xnb

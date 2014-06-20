@@ -19,16 +19,25 @@
       <Output>C:\Documents and Settings\Lee.HAL\my documents\visual studio 2010\Projects\Hero\Hero\Hero\bin\x86\Debug\Content\Terrain.xnb</Output>
       <Time>2014-06-17T18:43:13.75-04:00</Time>
     </Item>
+    <Item>
+      <Source>Blank.png</Source>
+      <Name>Blank</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\Lee.HAL\My Documents\Visual Studio 2010\Projects\Hero\Hero\Hero\bin\x86\Debug\Content\Blank.xnb</Output>
+      <Time>2014-06-19T23:41:39.6835195-04:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <TargetPlatform>Windows</TargetPlatform>
       <TargetProfile>HiDef</TargetProfile>
       <BuildConfiguration>Debug</BuildConfiguration>
       <CompressContent>false</CompressContent>
-      <RootDirectory>C:\Documents and Settings\Lee.HAL\my documents\visual studio 2010\Projects\Hero\Hero\HeroContent\</RootDirectory>
-      <LoggerRootDirectory>C:\Documents and Settings\Lee.HAL\my documents\visual studio 2010\Projects\Hero\Hero\Hero\</LoggerRootDirectory>
-      <IntermediateDirectory>C:\Documents and Settings\Lee.HAL\my documents\visual studio 2010\Projects\Hero\Hero\HeroContent\obj\x86\Debug\</IntermediateDirectory>
-      <OutputDirectory>C:\Documents and Settings\Lee.HAL\my documents\visual studio 2010\Projects\Hero\Hero\Hero\bin\x86\Debug\Content\</OutputDirectory>
+      <RootDirectory>C:\Documents and Settings\Lee.HAL\My Documents\Visual Studio 2010\Projects\Hero\Hero\HeroContent\</RootDirectory>
+      <LoggerRootDirectory>C:\Documents and Settings\Lee.HAL\My Documents\Visual Studio 2010\Projects\Hero\Hero\Hero\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Documents and Settings\Lee.HAL\My Documents\Visual Studio 2010\Projects\Hero\Hero\HeroContent\obj\x86\Debug\</IntermediateDirectory>
+      <OutputDirectory>C:\Documents and Settings\Lee.HAL\My Documents\Visual Studio 2010\Projects\Hero\Hero\Hero\bin\x86\Debug\Content\</OutputDirectory>
     </Settings>
     <Assemblies>
       <Assembly>

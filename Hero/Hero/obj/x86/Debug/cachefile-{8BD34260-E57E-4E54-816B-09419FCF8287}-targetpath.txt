@@ -1,2 +1,3 @@
 Content\Avatar.xnb
 Content\Terrain.xnb
+Content\Blank.xnb

@@ -28,6 +28,7 @@ namespace Hero
         IMapService MapService { get; set; }
         IStageService StageService { get; set; }
         ICameraService CameraService { get; set; }
+        IHUDService HUDService { get; set; }
 
         Dictionary<IActor, StatSheet> _statSheets;
 
@@ -44,6 +45,7 @@ namespace Hero
             this.MapService = (IMapService)Game.Services.GetService(typeof(IMapService));
             this.StageService = (IStageService)Game.Services.GetService(typeof(IStageService));
             this.CameraService = (ICameraService)Game.Services.GetService(typeof(ICameraService));
+            this.HUDService = (IHUDService)Game.Services.GetService(typeof(IHUDService));
 
             //Initialize Player
             this._statSheets = new Dictionary<IActor, StatSheet>();
@@ -72,9 +74,13 @@ namespace Hero
             else if (ks[Keys.S]) player.Facing = Vector2.UnitY * (1);
             else if (ks[Keys.A]) player.Facing = Vector2.UnitX * (-1);
             else if (ks[Keys.D]) player.Facing = Vector2.UnitX * (1);
-            else return;
+            else
+            {
+                this.HUDService.StaminaPerc = this.HUDService.StaminaPerc + 1;
+                return;
+            } //Collision not calculated for non-movement
 
-            //Calculate collision bounds
+            //Calculate leading edge collision points
             Vector2 proposed = player.Facing * 1F;
             Vector2 loc = this.StageService.GetActorLoc(player);
             Vector2 newloc = loc + proposed;
@@ -92,16 +98,16 @@ namespace Hero
                 c2.Y -= player.Radius;
             }
 
-            //Water check
-            bool water = this.MapService.IsWaterAt(this.MapService.GetGridRef(c1))
-                & this.MapService.IsWaterAt(this.MapService.GetGridRef(c2));
-       
-            if (proposed != Vector2.Zero & !water) 
+            //If collision comes up negative then move
+            if (!(CheckMapCollisionAt(c1) & CheckMapCollisionAt(c2)))
+            {
                 this.StageService.MoveActor(this.StageService.GetActorByID(0), Vector2.Normalize(proposed) * 2);
+                this.HUDService.StaminaPerc = this.HUDService.StaminaPerc - 1;
+            }
         }
-        void CheckMapCollisionAt(int x, int y)
+        bool CheckMapCollisionAt(Vector2 v)
         {
-
+            return this.MapService.IsWaterAt(this.MapService.GetGridRef(v));
         }
         void UpdateStatus(GameTime gameTime)
         {
