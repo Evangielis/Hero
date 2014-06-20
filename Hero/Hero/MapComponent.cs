@@ -9,93 +9,14 @@ using Archidamas.Extensions;
 
 namespace Hero
 {
-    enum Feature
-    {
-        None,
-        StartPoint,
-    };
-
-    enum Floor
-    {
-        None,
-        Ocean,
-        Grass
-    };
-
-    interface IMapFeature
-    {
-        Texture2D Texture { get; set; }
-        Rectangle Source { get; set; }
-    }
-    class MapFeature : IMapFeature
-    {
-        Texture2D Texture { get; set; }
-        Rectangle Source { get; set; }
-
-        Texture2D IMapFeature.Texture
-        {
-            get
-            {
-                return this.Texture;
-            }
-            set
-            {
-                this.Texture = value;
-            }
-        }
-
-        Rectangle IMapFeature.Source
-        {
-            get
-            {
-                return this.Source;
-            }
-            set
-            {
-                this.Source = value;
-            }
-        }
-    }
-    interface IFloorTile
-    {
-        Texture2D Texture { get; set; }
-        Rectangle Source { get; set; }
-    }
-    class FloorTile : IFloorTile
-    {
-        Texture2D Texture { get; set; }
-        Rectangle Source { get; set; }
-
-        Texture2D IFloorTile.Texture
-        {
-            get
-            {
-                return this.Texture;
-            }
-            set
-            {
-                this.Texture = value;
-            }
-        }
-        Rectangle IFloorTile.Source
-        {
-            get
-            {
-                return this.Source;
-            }
-            set
-            {
-                this.Source = value;
-            }
-        }
-    }
-
     interface IMapService
     {
         Vector2 GetActualLoc(int x, int y);
         Vector2 GetActualLoc(Point p);
         Point GetGridRef(Vector2 v);
-        //Point[] GetGridRange(Rectangle bounds);
+
+        bool IsWaterAt(int x, int y);
+        bool IsWaterAt(Point p);
         
         void SetFloorAt(int x, int y, Floor floor);
         void SetFeatureAt(int x, int y, Feature feature);
@@ -112,8 +33,9 @@ namespace Hero
         int MapSize { get; set; }
 
         //Dictionaries
-        Dictionary<Feature, IMapFeature> _featureDict;
-        Dictionary<Floor, IFloorTile> _floorDict;
+        //Dictionary<Feature, IMapFeature> _featureDict { get; set; }
+        //Dictionary<Floor, IFloorTile> _floorDict { get; set; }
+        ITileLibrary TileLibrary { get; set; }
 
         IMapFeature[,] _features;
         IFloorTile[,] _floors;
@@ -124,68 +46,36 @@ namespace Hero
         /// <summary>
         /// This is a representation of the player loc using grid coordinates.
         /// </summary>
-        Point PlayerGridLoc 
-        { 
-            get
-            {
-                return this.GetGridRef(this.StageService.PlayerLoc);
-            }
-        }
         #endregion
 
         public MapComponent(Game game)
             : base(game)
         {
             game.Components.Add(this);
+            game.Services.AddService(typeof(IMapService), this);
         }
 
         public override void Initialize()
         {
             this.DrawOrder = DRAW_ORDER;
 
-            _featureDict = new Dictionary<Feature, IMapFeature>();
-            _floorDict = new Dictionary<Floor, IFloorTile>();
-
+            this.TileLibrary = new TileLibrary(Game, TILE_SIZE);
+            
             _features = new IMapFeature[MAX_MAP_SIZE, MAX_MAP_SIZE];
             _floors = new IFloorTile[MAX_MAP_SIZE, MAX_MAP_SIZE];
 
-            this.SpriteBatch = new SpriteBatch(Game.GraphicsDevice);
             this.CameraService = (ICameraService)Game.Services.GetService(typeof(ICameraService));
             this.StageService = (IStageService)Game.Services.GetService(typeof(IStageService));
 
             base.Initialize();
         }
 
-        #region Content Methods
         protected override void LoadContent()
         {
-            //Features
-            _featureDict.Add(Feature.None, null);
-
-            //Floor tiles
-            _floorDict.Add(Floor.None, null);
-            _floorDict.Add(Floor.Grass, LoadFloorTile("Terrain", 0, 0));
-            _floorDict.Add(Floor.Ocean, LoadFloorTile("Terrain", 1, 0));
+            this.SpriteBatch = new SpriteBatch(Game.GraphicsDevice);
 
             base.LoadContent();
         }
-        IMapFeature LoadMapFeature(string spriteSheet, int sourceX, int sourceY)
-        {
-            Rectangle sourceRect = new Rectangle(sourceX * TILE_SIZE, sourceY * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-            IMapFeature feature = new MapFeature();
-            feature.Texture = Game.Content.Load<Texture2D>(spriteSheet);
-            feature.Source = sourceRect;
-            return feature;
-        }
-        IFloorTile LoadFloorTile(string spriteSheet, int sourceX, int sourceY)
-        {
-            Rectangle sourceRect = new Rectangle(sourceX * TILE_SIZE, sourceY * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-            IFloorTile tile = new FloorTile();
-            tile.Texture = Game.Content.Load<Texture2D>(spriteSheet);
-            tile.Source = sourceRect;
-            return tile;
-        }
-        #endregion
 
         public override void Update(GameTime gameTime)
         {
@@ -196,7 +86,8 @@ namespace Hero
         public override void Draw(GameTime gameTime)
         {
             //Optimize this
-            Rectangle drawBounds = new Rectangle(PlayerGridLoc.X, PlayerGridLoc.Y, DRAW_BUFFER * 4, DRAW_BUFFER * 2);
+            Point p = this.GetGridRef(this.CameraService.Center);
+            Rectangle drawBounds = new Rectangle(p.X, p.Y, DRAW_BUFFER * 4, DRAW_BUFFER * 2);
             drawBounds.Offset(-2 * DRAW_BUFFER, -1 * DRAW_BUFFER);
 
             this.SpriteBatch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, this.CameraService.TranslationMatrix);
@@ -233,8 +124,8 @@ namespace Hero
             {
                 for (int j = 0; j < MAX_MAP_SIZE; j++)
                 {
-                    this._floors[i, j] = this._floorDict[Floor.Ocean];
-                    this._features[i, j] = this._featureDict[Feature.None];
+                    this._floors[i, j] = this.TileLibrary.GetFloorTile(Floor.Ocean);
+                    this._features[i, j] = this.TileLibrary.GetFeature(Feature.None);
                 }
             }
         }
@@ -275,19 +166,207 @@ namespace Hero
         }
         void IMapService.SetFloorAt(int x, int y, Floor floor)
         {
-            this._floors[x, y] = this._floorDict[floor];
+            this._floors[x, y] = this.TileLibrary.GetFloorTile(floor);
         }
         void IMapService.SetFeatureAt(int x, int y, Feature feature)
         {
             //Watch for meta features here.
             if (feature.Equals(Feature.StartPoint))
             {
-                this.StageService.TeleportPlayer(this.GetActualLoc(x, y));
+                this.StageService.TeleportActor(this.StageService.GetActorByID(0), this.GetActualLoc(x, y));
                 return;
             }
 
-            this._features[x, y] = this._featureDict[feature];
+            this._features[x, y] = this.TileLibrary.GetFeature(feature);
+        }
+        bool IMapService.IsWaterAt(int x, int y)
+        {
+            return this.TileLibrary.IsWaterTerrain(this._floors[x, y].Type);
+        }
+        bool IMapService.IsWaterAt(Point p)
+        {
+            return this.TileLibrary.IsWaterTerrain(this._floors[p.X, p.Y].Type);
         }
         #endregion
     }
+
+    #region MapTileLibrary stuff
+    enum Feature
+    {
+        None,
+        StartPoint,
+    };
+
+    enum Floor
+    {
+        None,
+        Ocean,
+        Grass
+    };
+
+    enum TerrainType
+    {
+        Grass,
+        Saltwater,
+        Sand
+    };
+
+    interface IMapFeature
+    {
+        Texture2D Texture { get; set; }
+        Rectangle Source { get; set; }
+    }
+    class MapFeature : IMapFeature
+    {
+        Texture2D Texture { get; set; }
+        Rectangle Source { get; set; }
+
+        Texture2D IMapFeature.Texture
+        {
+            get
+            {
+                return this.Texture;
+            }
+            set
+            {
+                this.Texture = value;
+            }
+        }
+
+        Rectangle IMapFeature.Source
+        {
+            get
+            {
+                return this.Source;
+            }
+            set
+            {
+                this.Source = value;
+            }
+        }
+    }
+    interface IFloorTile
+    {
+        Texture2D Texture { get; set; }
+        Rectangle Source { get; set; }
+        TerrainType Type { get; set; }
+    }
+    class FloorTile : IFloorTile
+    {
+        Texture2D Texture { get; set; }
+        Rectangle Source { get; set; }
+        TerrainType Type { get; set; }
+
+        Texture2D IFloorTile.Texture
+        {
+            get
+            {
+                return this.Texture;
+            }
+            set
+            {
+                this.Texture = value;
+            }
+        }
+        Rectangle IFloorTile.Source
+        {
+            get
+            {
+                return this.Source;
+            }
+            set
+            {
+                this.Source = value;
+            }
+        }
+        TerrainType IFloorTile.Type
+        {
+            get
+            {
+                return this.Type;
+            }
+            set
+            {
+                this.Type = value;
+            }
+        }
+    }
+    interface ITileLibrary
+    {
+        IMapFeature GetFeature(Feature feature);
+        IFloorTile GetFloorTile(Floor tile);
+        bool IsWaterTerrain(TerrainType type);
+    }
+    class TileLibrary : ITileLibrary
+    {
+        int TILE_SIZE { get; set; }
+
+        Game Game { get; set; }
+
+        Dictionary<Feature, IMapFeature> _featureDict;
+        Dictionary<Floor, IFloorTile> _floorDict;
+
+        public TileLibrary(Game game, int tilesize)
+        {
+            this.Game = game;
+            this.TILE_SIZE = tilesize;
+
+            this.Initialize();
+            this.LoadContent();
+        }
+
+        public void Initialize() 
+        {
+            _featureDict = new Dictionary<Feature, IMapFeature>();
+            _floorDict = new Dictionary<Floor, IFloorTile>();
+        }
+
+        public void LoadContent()
+        {
+            //Features
+            _featureDict.Add(Feature.None, null);
+
+            //Floor tiles
+            _floorDict.Add(Floor.None, null);
+            _floorDict.Add(Floor.Grass, LoadFloorTile("Terrain", 0, 0, TerrainType.Grass));
+            _floorDict.Add(Floor.Ocean, LoadFloorTile("Terrain", 1, 0, TerrainType.Saltwater));
+        }
+        IMapFeature LoadMapFeature(string spriteSheet, int sourceX, int sourceY)
+        {
+            Rectangle sourceRect = new Rectangle(sourceX * TILE_SIZE, sourceY * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            IMapFeature feature = new MapFeature();
+            feature.Texture = Game.Content.Load<Texture2D>(spriteSheet);
+            feature.Source = sourceRect;
+            return feature;
+        }
+        IFloorTile LoadFloorTile(string spriteSheet, int sourceX, int sourceY, TerrainType type)
+        {
+            Rectangle sourceRect = new Rectangle(sourceX * TILE_SIZE, sourceY * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            IFloorTile tile = new FloorTile();
+            tile.Texture = Game.Content.Load<Texture2D>(spriteSheet);
+            tile.Source = sourceRect;
+            tile.Type = type;
+            return tile;
+        }
+
+        IMapFeature ITileLibrary.GetFeature(Feature feature)
+        {
+            return this._featureDict[feature];
+        }
+        IFloorTile ITileLibrary.GetFloorTile(Floor tile)
+        {
+            return this._floorDict[tile];
+        }
+        bool ITileLibrary.IsWaterTerrain(TerrainType type)
+        {
+            switch (type)
+            {
+                case TerrainType.Saltwater: return true;
+                default: return false;
+            }
+        }
+    }
+    #endregion
 }
+
+
